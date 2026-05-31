@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ stock.ticker }} - Hisse Detay ve Analiz Paneli</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <style>
+        :root {
+            --bg-primary: #080c14;
+            --bg-surface: rgba(17, 24, 39, 0.7);
+            --bg-input: rgba(10, 15, 26, 0.8);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --color-accent: #6366f1;
+            --color-accent-hover: #4f46e5;
+            --color-success: #10b981;
+            --color-danger: #ef4444;
+            --color-gold: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-primary) 75%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.05em;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .username-highlight {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.88rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            text-decoration: none;
+            gap: 0.5rem;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.78rem;
+            border-radius: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent), #4f46e5);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-buy {
+            background: var(--color-success);
+            color: white;
+            flex-grow: 1;
+        }
+        
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-sell {
+            background: var(--color-danger);
+            color: white;
+            flex-grow: 1;
+        }
+        
+        .btn-sell:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Alert styling */
+        .alert-container {
+            width: 100%;
+        }
+
+        .alert {
+            padding: 0.85rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid;
+            font-size: 0.88rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: var(--color-success);
+            color: #34d399;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: var(--color-danger);
+            color: #fca5a5;
+        }
+
+        /* Page Layout Grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-card-section {
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .ticker-badge {
+            padding: 0.3rem 0.7rem;
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            font-weight: 800;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: inline-block;
+        }
+
+        /* Meta Information Cards */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-card {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .info-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .price-hero {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+        }
+
+        .price-hero-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+        }
+
+        /* Chart Frame */
+        .chart-frame {
+            position: relative;
+            background: rgba(10, 15, 26, 0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem 1rem 1rem 1rem;
+            width: 100%;
+            height: 380px;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Interactive details under chart */
+        .chart-details-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            padding: 0 0.5rem;
+        }
+
+        /* Trade Widget */
+        .trade-terminal {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .qty-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .qty-input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .qty-input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25);
+        }
+
+        .calc-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(10, 15, 26, 0.6);
+            border-radius: 8px;
+            font-size: 0.88rem;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        /* News styling */
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .news-item {
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.84rem;
+            line-height: 1.35;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        .news-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.07);
+        }
+
+        .news-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .news-badge {
+            font-weight: 800;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .news-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .badge-positive {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--color-success);
+        }
+
+        .badge-negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--color-danger);
+        }
+
+        .text-emerald { color: var(--color-success); }
+        .text-danger { color: var(--color-danger); }
+        .text-gold { color: var(--color-gold); }
+
+        .empty-state {
+            padding: 2rem 1rem;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.84rem;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo-container">
+            <span class="logo-text">📈 BORSA SİMÜLASYONU</span>
+        </div>
+        <div class="user-menu">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-sm">
+                ◀ Dashboard'a Dön
+            </a>
+            <span style="font-size: 0.9rem; color: var(--text-secondary);">
+                Oyuncu: <span class="username-highlight">{{ current_user.username }}</span>
+            </span>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Bildirimler (Flashed Messages) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Hisse Hero Başlık Kartı -->
+        <section class="glass-card" style="padding: 1.5rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; background: rgba(17, 24, 39, 0.5);">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span class="ticker-badge" style="font-size: 1.3rem; padding: 0.4rem 0.9rem;">{{ stock.ticker }}</span>
+                <div>
+                    <h1 style="font-size: 1.6rem; font-weight: 800; color: white;">{{ stock.company_name }}</h1>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">{{ stock.sector }}</span>
+                </div>
+            </div>
+            <div class="price-hero">
+                <div style="text-align: right; display: flex; flex-direction: column; gap: 0.25rem;">
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; text-transform: uppercase;">Güncel Piyasa Fiyatı</span>
+                    <span class="price-hero-value text-indigo" id="live-price">{{ "{:,.2f}".format(stock.current_price).replace(",", "X").replace(".", ",").replace("X", ".") }} TL</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detay Izgara Layout -->
+        <div class="detail-grid">
+            
+            <!-- Sol Panel: Büyük Detaylı Grafik -->
+            <section class="glass-card-section" style="margin-bottom: 0;">
+                <h2 class="section-title">📊 Genişletilmiş Fiyat Trend Analizi (Son 30 Tık)</h2>
+                
+                <div class="chart-frame">
+                    <canvas id="large-price-chart" class="chart-canvas" data-history="{{ history_prices|tojson }}"></canvas>
+                </div>
+
+                <div class="chart-details-summary">
+                    <div>
+                        En Düşük: <strong class="text-danger" id="min-indicator">0,00 TL</strong>
+                    </div>
+                    <div style="text-align: center;">
+                        Genel Trend: <strong id="trend-indicator" class="text-emerald">YUKARI 📈</strong>
+                    </div>
+                    <div style="text-align: right;">
+                        En Yüksek: <strong class="text-emerald" id="max-indicator">0,00 TL</strong>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sağ Panel: Portföy, İşlem Terminali ve Özel Haberler -->
+            <aside style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Bakiye & Portföy Widget -->
+                <div class="glass-card-section" style="margin-bottom: 0;">
+                    <h2 class="section-title">💼 Portföy & Bakiye Durumu</h2>
+                    
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <span class="info-label">Nakit Bakiyeniz</span>
+                            <span class="info-value text-gold" id="user-cash" style="font-size: 0.95rem;">
+                                {{ "{:,.2f}".format(current_user.available_cash).replace(",", "X").replace(".", ",").replace("X", ".") }} TL
+                            </span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Sahip Olunan</span>
+                            <span class="info-value" id="portfolio-quantity">
+                                <strong>{{ portfolio_detail.quantity }}</strong> adet
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <span class="info-label">Ort. Maliyet</span>
+                            <span class="info-value" id="portfolio-avg-cost" style="font-size: 0.95rem;">
+                                {{ "{:,.2f}".format(portfolio_detail.average_cost).replace(",", "X").replace(".", ",").replace("X", ".") }} TL
+                            </span>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Toplam Değer</span>
+                            <span class="info-value text-indigo" id="portfolio-current-value" style="font-size: 0.95rem;">
+                                {{ "{:,.2f}".format(portfolio_detail.current_value).replace(",", "X").replace(".", ",").replace("X", ".") }} TL
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-card" style="align-items: center; justify-content: center; gap: 0.3rem;">
+                        <span class="info-label">Hisse Net Kâr / Zarar</span>
+                        <span class="info-value {{ 'text-emerald' if portfolio_detail.profit_loss >= 0 else 'text-danger' }}" id="portfolio-profit-loss" style="font-size: 1.25rem;">
+                            {{ '+' if portfolio_detail.profit_loss > 0 }}{{ "{:,.2f}".format(portfolio_detail.profit_loss).replace(",", "X").replace(".", ",").replace("X", ".") }} TL
+                            <span style="font-size: 0.85rem; font-weight: 500;">
+                                ({{ '+' if portfolio_detail.profit_loss > 0 }}{{ "%.2f"|format(portfolio_detail.profit_loss_pct) }}%)
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- İşlem Terminali Widget -->
+                <div class="glass-card-section" style="margin-bottom: 0;">
+                    <h2 class="section-title">⚡ Anlık İşlem Terminali</h2>
+                    
+                    <form method="POST" action="{{ url_for('trade', stock_id=stock.id) }}" class="trade-terminal">
+                        <div class="form-group">
+                            <label for="quantity">İşlem Adeti</label>
+                            <div class="qty-input-group">
+                                <button type="button" class="btn btn-secondary" onclick="adjustQty(-1)" style="padding: 0.75rem 1.1rem; font-weight: 800; font-size: 1.1rem;">-</button>
+                                <input type="number" id="quantity-input" name="quantity" min="1" value="1" class="qty-input" required oninput="calcTotalCost()">
+                                <button type="button" class="btn btn-secondary" onclick="adjustQty(1)" style="padding: 0.75rem 1.1rem; font-weight: 800; font-size: 1.1rem;">+</button>
+                            </div>
+                        </div>
+
+                        <div class="calc-box">
+                            <span style="color: var(--text-secondary); font-weight: 500;">Tahmini İşlem Bedeli:</span>
+                            <strong style="color: white; font-size: 1.05rem;" id="total-cost-display">0,00 TL</strong>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button type="submit" name="action" value="BUY" class="btn btn-buy">AL</button>
+                            <button type="submit" name="action" value="SELL" class="btn btn-sell">SAT</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Özel Şirket Haber Akışı -->
+                <div class="glass-card-section">
+                    <h2 class="section-title">📰 {{ stock.ticker }} Haber Geçmişi</h2>
+                    <div class="news-list" id="stock-news-container">
+                        {% if stock_news %}
+                            {% for item in stock_news %}
+                                <div class="news-item">
+                                    <div class="news-header">
+                                        <span class="news-badge {{ 'badge-positive' if item.news_type == 'positive' else 'badge-negative' }}">
+                                            {{ 'OLUMLU 📈' if item.news_type == 'positive' else 'OLUMSUZ 📉' }}
+                                        </span>
+                                        <span class="news-time">{{ item.timestamp.strftime('%H:%M:%S') }}</span>
+                                    </div>
+                                    <div style="font-weight: 500; color: white;">
+                                        {{ item.headline }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                Bu şirkete özel henüz bir haber kaydı oluşmadı.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- Büyük Detaylı Grafik Çizim ve Polling Scripti -->
+    <script>
+        let livePriceValue = {{ stock.current_price }};
+        const stockTicker = "{{ stock.ticker }}";
+        const stockId = {{ stock.id }};
+        
+        function formatTurkishLira(num) {
+            return num.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+        }
+
+        function adjustQty(amount) {
+            const input = document.getElementById('quantity-input');
+            let val = parseInt(input.value) || 0;
+            val += amount;
+            if (val < 1) val = 1;
+            input.value = val;
+            calcTotalCost();
+        }
+
+        function calcTotalCost() {
+            const qty = parseInt(document.getElementById('quantity-input').value) || 0;
+            const total = qty * livePriceValue;
+            document.getElementById('total-cost-display').innerText = formatTurkishLira(total) + " TL";
+        }
+
+        // Reusable Large Chart Drawer
+        function drawLargeChart(canvas, prices) {
+            if (!prices || prices.length < 2) return;
+
+            const ctx = canvas.getContext('2d');
+            
+            // Adjust canvas sizing for high-DPI displays
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+            ctx.scale(dpr, dpr);
+
+            const width = rect.width;
+            const height = rect.height;
+
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            const range = (max - min === 0) ? 1 : (max - min);
+
+            // Populate summary indicators
+            document.getElementById('min-indicator').innerText = formatTurkishLira(min) + " TL";
+            document.getElementById('max-indicator').innerText = formatTurkishLira(max) + " TL";
+            
+            const isUp = prices[prices.length - 1] >= prices[0];
+            const trendIndicator = document.getElementById('trend-indicator');
+            if (isUp) {
+                trendIndicator.innerText = "YUKARI 📈";
+                trendIndicator.className = "text-emerald";
+            } else {
+                trendIndicator.innerText = "AŞAĞI 📉";
+                trendIndicator.className = "text-danger";
+            }
+
+            const strokeColor = isUp ? '#10b981' : '#ef4444';
+            const shadowColor = isUp ? 'rgba(16, 185, 129, 0.4)' : 'rgba(239, 68, 68, 0.4)';
+
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. Draw Grid Lines (Horizontal and Vertical)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+
+            // Horizontal grid lines
+            const gridRows = 5;
+            for (let i = 0; i <= gridRows; i++) {
+                const y = 30 + (i / gridRows) * (height - 60);
+                ctx.beginPath();
+                ctx.moveTo(30, y);
+                ctx.lineTo(width - 30, y);
+                ctx.stroke();
+
+                // Draw price indicators on Y-Axis
+                ctx.setLineDash([]);
+                ctx.fillStyle = '#9ca3af';
+                ctx.font = '500 9px Inter';
+                ctx.textAlign = 'right';
+                const priceValue = max - (i / gridRows) * range;
+                ctx.fillText(formatTurkishLira(priceValue) + " TL", 25, y + 3);
+                ctx.setLineDash([4, 4]);
+            }
+
+            // Vertical grid lines
+            const gridCols = Math.min(10, prices.length - 1);
+            for (let i = 0; i <= gridCols; i++) {
+                const x = 40 + (i / gridCols) * (width - 80);
+                ctx.beginPath();
+                ctx.moveTo(x, 25);
+                ctx.lineTo(x, height - 25);
+                ctx.stroke();
+            }
+            ctx.setLineDash([]); // Reset line dashes
+
+            // 2. Draw Elegant Price Line Path
+            ctx.beginPath();
+            prices.forEach(function(price, index) {
+                const x = 40 + (index / (prices.length - 1)) * (width - 80);
+                const y = height - 30 - ((price - min) / range) * (height - 60);
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+
+            // Set stroke styles and draw
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = shadowColor;
+            ctx.stroke();
+            ctx.shadowBlur = 0; // Reset shadow
+
+            // 3. Draw Chart Underfill (Elegant harmony gradient)
+            const fillGrad = ctx.createLinearGradient(0, 0, 0, height);
+            fillGrad.addColorStop(0, isUp ? 'rgba(16, 185, 129, 0.18)' : 'rgba(239, 68, 68, 0.18)');
+            fillGrad.addColorStop(1, 'rgba(8, 12, 20, 0)');
+
+            ctx.beginPath();
+            prices.forEach(function(price, index) {
+                const x = 40 + (index / (prices.length - 1)) * (width - 80);
+                const y = height - 30 - ((price - min) / range) * (height - 60);
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.lineTo(40 + (width - 80), height - 20);
+            ctx.lineTo(40, height - 20);
+            ctx.closePath();
+            ctx.fillStyle = fillGrad;
+            ctx.fill();
+
+            // 4. Highlight the last (most recent) price point
+            const lastIndex = prices.length - 1;
+            const lastX = 40 + (lastIndex / (prices.length - 1)) * (width - 80);
+            const lastY = height - 30 - ((prices[lastIndex] - min) / range) * (height - 60);
+
+            // Draw glowing halo around last price point
+            ctx.beginPath();
+            ctx.arc(lastX, lastY, 7, 0, 2 * Math.PI);
+            ctx.fillStyle = isUp ? 'rgba(16, 185, 129, 0.25)' : 'rgba(239, 68, 68, 0.25)';
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(lastX, lastY, 3.5, 0, 2 * Math.PI);
+            ctx.fillStyle = strokeColor;
+            ctx.fill();
+        }
+
+        // Initialize Calculation and Poller on Load
+        document.addEventListener("DOMContentLoaded", function() {
+            const canvas = document.getElementById('large-price-chart');
+            const prices = JSON.parse(canvas.getAttribute('data-history'));
+            drawLargeChart(canvas, prices);
+            
+            calcTotalCost();
+            
+            // Poll background ticks every 5 seconds
+            setInterval(fetchMarketTick, 5000);
+        });
+
+        // AJAX background update function for Stock Details
+        function fetchMarketTick() {
+            fetch('/api/market-tick')
+                .then(response => {
+                    if (!response.ok) throw new Error('API tick error');
+                    return response.json();
+                })
+                .then(data => {
+                    // Find the current stock in the tick response
+                    const currentStock = data.stocks.find(s => s.id === stockId);
+                    if (!currentStock) return;
+
+                    // 1. Update Live Header Price & Local Calculation Variables
+                    livePriceValue = currentStock.current_price;
+                    document.getElementById('live-price').innerText = formatTurkishLira(livePriceValue) + " TL";
+                    calcTotalCost();
+
+                    // 2. Re-draw Large Price Trend Chart
+                    const canvas = document.getElementById('large-price-chart');
+                    if (canvas) {
+                        canvas.setAttribute('data-history', JSON.stringify(currentStock.full_history));
+                        drawLargeChart(canvas, currentStock.full_history);
+                    }
+
+                    // 3. Update Nakit & Portfolio status
+                    document.getElementById('user-cash').innerText = formatTurkishLira(data.user_cash) + " TL";
+                    
+                    const userPortfolioItem = data.portfolio_details.find(p => p.ticker === stockTicker);
+                    const qtyEl = document.getElementById('portfolio-quantity');
+                    const avgCostEl = document.getElementById('portfolio-avg-cost');
+                    const curValueEl = document.getElementById('portfolio-current-value');
+                    const profitLossEl = document.getElementById('portfolio-profit-loss');
+
+                    if (userPortfolioItem) {
+                        qtyEl.innerHTML = `<strong>${userPortfolioItem.quantity}</strong> adet`;
+                        avgCostEl.innerText = formatTurkishLira(userPortfolioItem.average_cost) + " TL";
+                        curValueEl.innerText = formatTurkishLira(userPortfolioItem.current_value) + " TL";
+                        
+                        const profitClass = userPortfolioItem.profit_loss >= 0 ? 'text-emerald' : 'text-danger';
+                        const profitSign = userPortfolioItem.profit_loss > 0 ? '+' : '';
+                        profitLossEl.className = `info-value ${profitClass}`;
+                        profitLossEl.innerHTML = `
+                            ${profitSign}${formatTurkishLira(userPortfolioItem.profit_loss)} TL
+                            <span style="font-size: 0.85rem; font-weight: 500;">
+                                (${profitSign}${userPortfolioItem.profit_loss_pct.toFixed(2)}%)
+                            </span>
+                        `;
+                    } else {
+                        qtyEl.innerHTML = `<strong>0</strong> adet`;
+                        avgCostEl.innerText = "0,00 TL";
+                        curValueEl.innerText = "0,00 TL";
+                        profitLossEl.className = "info-value";
+                        profitLossEl.innerHTML = `
+                            0,00 TL
+                            <span style="font-size: 0.85rem; font-weight: 500;">
+                                (0.00%)
+                            </span>
+                        `;
+                    }
+
+                    // 4. Filter and Update Company Specific News Log
+                    const newsListContainer = document.getElementById('stock-news-container');
+                    if (newsListContainer && data.news_feed) {
+                        const keywords = {
+                            "THYAO": ["THYAO", "Hava Yolları"],
+                            "ASELS": ["ASELS", "ASELSAN"],
+                            "EREGL": ["EREGL", "Ereğli"],
+                            "GARAN": ["GARAN", "Garanti"],
+                            "TUPRS": ["TUPRS", "Tüpraş"]
+                        };
+                        const matchKeywords = keywords[stockTicker] || [stockTicker];
+                        const filteredNews = data.news_feed.filter(n => {
+                            return matchKeywords.some(kw => n.headline.toLowerCase().includes(kw.toLowerCase()));
+                        });
+
+                        newsListContainer.innerHTML = '';
+                        if (filteredNews.length === 0) {
+                            newsListContainer.innerHTML = '<div class="empty-state">Bu şirkete özel henüz bir haber kaydı oluşmadı.</div>';
+                        } else {
+                            filteredNews.forEach(n => {
+                                const itemDiv = document.createElement('div');
+                                itemDiv.className = 'news-item';
+                                const badgeClass = n.news_type === 'positive' ? 'badge-positive' : 'badge-negative';
+                                const badgeText = n.news_type === 'positive' ? 'OLUMLU 📈' : 'OLUMSUZ 📉';
+                                itemDiv.innerHTML = `
+                                    <div class="news-header">
+                                        <span class="news-badge ${badgeClass}">${badgeText}</span>
+                                        <span class="news-time">${n.time}</span>
+                                    </div>
+                                    <div style="font-weight: 500; color: white;">${n.headline}</div>
+                                `;
+                                newsListContainer.appendChild(itemDiv);
+                            });
+                        }
+                    }
+                })
+                .catch(err => console.error('Stock detail polling failed:', err));
+        }
+    </script>
+</body>
+</html>

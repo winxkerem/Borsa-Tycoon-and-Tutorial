@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borsa Simülasyonu - Kontrol Paneli</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+    <style>
+        :root {
+            --bg-primary: #080c14;
+            --bg-surface: rgba(17, 24, 39, 0.7);
+            --bg-input: rgba(10, 15, 26, 0.8);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --color-accent: #6366f1;
+            --color-accent-hover: #4f46e5;
+            --color-success: #10b981;
+            --color-danger: #ef4444;
+            --color-gold: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-primary) 75%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem 2rem;
+            background: rgba(8, 12, 20, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.05em;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .username-highlight {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.78rem;
+            border-radius: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-accent), #4f46e5);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-buy {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--color-success);
+            color: var(--color-success);
+        }
+        
+        .btn-buy:hover {
+            background: var(--color-success);
+            color: white;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-sell {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--color-danger);
+            color: var(--color-danger);
+        }
+        
+        .btn-sell:hover {
+            background: var(--color-danger);
+            color: white;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .dashboard-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Notifications */
+        .alert-container {
+            width: 100%;
+        }
+
+        .alert {
+            padding: 0.85rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid;
+            font-size: 0.88rem;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.12);
+            border-color: var(--color-success);
+            color: #34d399;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.12);
+            border-color: var(--color-danger);
+            color: #fca5a5;
+        }
+
+        /* Stats Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card {
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            top: -75px;
+            right: -75px;
+            opacity: 0.08;
+            filter: blur(25px);
+        }
+
+        .stat-cash::after { background: var(--color-gold); }
+        .stat-portfolio::after { background: var(--color-success); }
+        .stat-networth::after { background: var(--color-accent); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: 1.7rem;
+            font-weight: 800;
+        }
+
+        .text-gold { color: var(--color-gold); }
+        .text-emerald { color: var(--color-success); }
+        .text-indigo { color: #818cf8; }
+
+        /* Main Workspace Layout */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .glass-card-section {
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            backdrop-filter: blur(16px);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Table Styling */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        .custom-table th {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.85rem 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .custom-table td {
+            padding: 0.85rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        .custom-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .ticker-badge {
+            padding: 0.25rem 0.55rem;
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            font-weight: 700;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            letter-spacing: 0.03em;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .ticker-link {
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .ticker-link:hover .ticker-badge {
+            background: var(--color-accent);
+            color: white;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+            transform: scale(1.05);
+        }
+
+        .company-link {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.2s ease;
+        }
+
+        .company-link:hover {
+            color: var(--color-accent);
+        }
+
+        .price-text {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .trade-form-inline {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .trade-qty-input {
+            width: 55px;
+            padding: 0.35rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: white;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .trade-qty-input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        .empty-state {
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            color: var(--text-secondary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .empty-state-title {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .sparkline-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* News Feed panel styling */
+        .news-feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+        }
+
+        .news-feed-item {
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.84rem;
+            line-height: 1.35;
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            transition: all 0.2s ease;
+        }
+
+        .news-feed-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .news-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .news-item-badge {
+            font-weight: 800;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-positive {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--color-success);
+        }
+
+        .badge-negative {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--color-danger);
+        }
+
+        .news-item-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .news-item-content {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Asset Tabs Styles */
+        .market-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: white;
+            background: linear-gradient(135deg, var(--color-accent), #4f46e5);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        }
+
+        /* Multiplayer Leaderboard Styles */
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            max-height: 280px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.65rem 0.85rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.84rem;
+            transition: all 0.2s ease;
+        }
+
+        .leaderboard-item.highlight {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.2);
+        }
+
+        .leaderboard-user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+        }
+
+        .leaderboard-rank {
+            font-weight: 800;
+            color: var(--text-secondary);
+            width: 20px;
+        }
+
+        .leaderboard-rank-1 { color: #f59e0b; }
+        .leaderboard-rank-2 { color: #d1d5db; }
+        .leaderboard-rank-3 { color: #b45309; }
+
+        .leaderboard-name {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .leaderboard-badge {
+            font-size: 0.62rem;
+            font-weight: 800;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .badge-sen { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3); }
+        .badge-bot { background: rgba(245, 158, 11, 0.12); color: var(--color-gold); border: 1px solid rgba(245, 158, 11, 0.25); }
+        .badge-player { background: rgba(255, 255, 255, 0.05); color: var(--text-secondary); border: 1px solid var(--border-color); }
+
+        .leaderboard-wealth {
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        /* AI Whale activity log feed */
+        .bot-activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 0.5rem;
+        }
+
+        .bot-activity-item {
+            padding: 0.65rem 0.85rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.82rem;
+            line-height: 1.4;
+            color: var(--text-primary);
+            animation: slideIn 0.3s ease;
+            border-left: 3px solid var(--color-accent);
+        }
+
+        /* AI Financial Advisor Floating Widget */
+        .ai-advisor-widget {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .ai-advisor-bubble {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--color-accent), #4f46e5);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .ai-advisor-bubble:hover {
+            transform: scale(1.08) translateY(-3px);
+            box-shadow: 0 12px 40px rgba(99, 102, 241, 0.6);
+        }
+
+        .ai-advisor-bubble .ai-icon {
+            font-size: 1.8rem;
+            animation: float-icon 3s ease-in-out infinite;
+        }
+
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-3px); }
+        }
+
+        .ai-advisor-status-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background-color: var(--color-success);
+            border: 2px solid var(--bg-primary);
+            box-shadow: 0 0 8px var(--color-success);
+            animation: pulse 2s infinite;
+        }
+
+        .ai-advisor-panel {
+            width: 380px;
+            max-width: calc(100vw - 4rem);
+            height: 480px;
+            margin-bottom: 1rem;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transform-origin: bottom right;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .ai-advisor-header {
+            padding: 1rem 1.25rem;
+            background: rgba(10, 15, 26, 0.85);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-advisor-title-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .ai-advisor-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+        }
+
+        .ai-advisor-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.02em;
+        }
+
+        .ai-advisor-subtitle {
+            font-size: 0.7rem;
+            color: var(--color-success);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.1rem;
+        }
+
+        .ai-advisor-close-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .ai-advisor-close-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .ai-advisor-body {
+            flex-grow: 1;
+            padding: 1.25rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background: rgba(8, 12, 20, 0.6);
+        }
+
+        .ai-advisor-chat-bubble {
+            padding: 0.95rem 1.15rem;
+            border-radius: 14px;
+            font-size: 0.84rem;
+            line-height: 1.45;
+            max-width: 95%;
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            color: var(--text-primary);
+        }
+
+        .ai-advisor-chat-bubble.advisor {
+            border-top-left-radius: 2px;
+            background: rgba(17, 24, 39, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Loading animation style */
+        .ai-loading-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            align-items: center;
+            padding: 1rem;
+            text-align: center;
+            width: 100%;
+        }
+
+        .ai-loading-bar-wrapper {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ai-loading-bar {
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--color-accent), var(--color-gold));
+            border-radius: 2px;
+            position: absolute;
+            animation: loading-slide 1.5s infinite ease-in-out;
+        }
+
+        @keyframes loading-slide {
+            0% { left: -40%; }
+            100% { left: 100%; }
+        }
+
+        .ai-loading-text {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: 0.02em;
+            animation: pulse 1.5s infinite;
+        }
+
+        .ai-advisor-footer {
+            padding: 1rem 1.25rem;
+            background: rgba(10, 15, 26, 0.85);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .ai-advisor-btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: linear-gradient(135deg, var(--color-accent), #4f46e5);
+            color: white;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .ai-advisor-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        }
+
+        .ai-advisor-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .ai-advisor-btn:disabled {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo-container">
+            <span class="logo-text">📈 BORSA SİMÜLASYONU</span>
+        </div>
+        <div class="user-menu">
+            <span style="font-size: 0.9rem; color: var(--text-secondary);">
+                Oyuncu: <span class="username-highlight">{{ current_user.username }}</span>
+            </span>
+            <a href="{{ url_for('logout') }}" class="btn btn-secondary btn-sm">Çıkış Yap</a>
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+        <!-- Bildirimler (Flashed Messages) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="alert-container">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Son Dakika Haber Paneli (Breaking News) at the Top -->
+        <div id="breaking-news-card" class="glass-card" style="padding: 1.1rem 1.5rem; border-left: 4px solid {{ '#10b981' if (news_item and (news_item.type == 'positive' or news_item.news_type == 'positive')) else '#ef4444' if news_item else 'rgba(0,0,0,0)' }}; display: {{ 'flex' if news_item else 'none' }}; align-items: center; gap: 1rem; background: rgba(17, 24, 39, 0.4); border-radius: 12px; margin-bottom: 1.5rem;">
+            <span id="breaking-news-badge" style="padding: 0.35rem 0.65rem; border-radius: 6px; font-weight: 800; font-size: 0.7rem; text-transform: uppercase; color: white; background: {{ '#10b981' if (news_item and (news_item.type == 'positive' or news_item.news_type == 'positive')) else '#ef4444' if news_item else 'var(--color-accent)' }}; letter-spacing: 0.05em; display: inline-flex; align-items: center; justify-content: center; animation: pulse 2s infinite; box-shadow: 0 0 10px {{ 'rgba(16, 185, 129, 0.2)' if (news_item and (news_item.type == 'positive' or news_item.news_type == 'positive')) else 'rgba(239, 68, 68, 0.2)' if news_item else 'rgba(0,0,0,0)' }};">
+                SON DAKİKA
+            </span>
+            <div id="breaking-news-headline" style="font-size: 0.9rem; font-weight: 500; color: var(--text-primary); line-height: 1.4;">
+                {{ news_item.headline if news_item else '' }}
+            </div>
+        </div>
+
+        <!-- Nakit, Portföy Değeri ve Toplam Varlık İstatistikleri -->
+        <section class="stats-grid">
+            <div class="stat-card stat-cash">
+                <span class="stat-label">Available Cash (Kullanılabilir Nakit)</span>
+                <span class="stat-value text-gold" id="user-cash">{{ "{:,.2f}".format(current_user.available_cash).replace(",", "X").replace(".", ",").replace("X", ".") }} TL</span>
+            </div>
+            <div class="stat-card stat-portfolio">
+                <span class="stat-label">Portfolio Value (Portföy Değeri)</span>
+                <span class="stat-value text-emerald" id="user-portfolio">{{ "{:,.2f}".format(total_portfolio_value).replace(",", "X").replace(".", ",").replace("X", ".") }} TL</span>
+            </div>
+            <div class="stat-card stat-networth">
+                <span class="stat-label">Total Wealth (Toplam Varlık)</span>
+                <span class="stat-value text-indigo" id="user-wealth">{{ "{:,.2f}".format(total_wealth).replace(",", "X").replace(".", ",").replace("X", ".") }} TL</span>
+            </div>
+        </section>
+
+        <!-- Ana Arayüz Grid Sistemi -->
+        <div class="main-grid">
+            
+            <!-- Sol Sütun: Market Hisseleri & Kripto Tablosu -->
+            <section class="glass-card-section">
+                <div class="market-tabs">
+                    <button id="tab-stocks" class="tab-btn active" onclick="switchMarketTab('stocks')">🏛️ Hisse Senetleri</button>
+                    <button id="tab-crypto" class="tab-btn" onclick="switchMarketTab('crypto')">🪙 Kripto Para Marketi</button>
+                </div>
+                
+                <!-- Stocks Table Container -->
+                <div class="table-container" id="stocks-table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Hisse Kodu</th>
+                                <th>Şirket Adı</th>
+                                <th style="text-align: center; width: 140px;">Trend (Geçmiş)</th>
+                                <th>Güncel Fiyat</th>
+                                <th style="text-align: center;">İşlem Paneli</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stocks-table-body">
+                            {% for stock in stocks %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('stock_detail', stock_id=stock.id) }}" class="ticker-link">
+                                            <span class="ticker-badge">{{ stock.ticker }}</span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('stock_detail', stock_id=stock.id) }}" class="company-link">
+                                            <strong>{{ stock.company_name }}</strong>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <!-- Sparkline HTML5 Canvas -->
+                                        <div class="sparkline-container">
+                                            <canvas class="sparkline" id="sparkline-{{ stock.ticker }}" data-prices="{{ stock.history|tojson }}" width="120" height="28" style="width: 120px; height: 28px;"></canvas>
+                                        </div>
+                                    </td>
+                                    <td><span class="price-text" id="price-{{ stock.ticker }}">{{ "{:,.2f}".format(stock.current_price).replace(",", "X").replace(".", ",").replace("X", ".") }} TL</span></td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('trade', stock_id=stock.id) }}" class="trade-form-inline" style="justify-content: center;">
+                                            <input type="number" name="quantity" min="1" value="1" class="trade-qty-input" required>
+                                            <button type="submit" name="action" value="BUY" class="btn btn-sm btn-buy">AL</button>
+                                            <button type="submit" name="action" value="SELL" class="btn btn-sm btn-sell">SAT</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Crypto Table Container -->
+                <div class="table-container" id="crypto-table-container" style="display: none;">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Coin</th>
+                                <th>Varlık Adı</th>
+                                <th style="text-align: center; width: 140px;">Trend (Geçmiş)</th>
+                                <th>Güncel Fiyat</th>
+                                <th style="text-align: center;">İşlem Paneli</th>
+                            </tr>
+                        </thead>
+                        <tbody id="crypto-table-body">
+                            {% for stock in crypto_stocks %}
+                                <tr>
+                                    <td>
+                                        <a href="{{ url_for('stock_detail', stock_id=stock.id) }}" class="ticker-link">
+                                            <span class="ticker-badge" style="background: rgba(245, 158, 11, 0.15); color: #fcd34d; border-color: rgba(245, 158, 11, 0.3);">{{ stock.ticker }}</span>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('stock_detail', stock_id=stock.id) }}" class="company-link">
+                                            <strong>{{ stock.company_name }}</strong>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <!-- Sparkline HTML5 Canvas -->
+                                        <div class="sparkline-container">
+                                            <canvas class="sparkline" id="sparkline-{{ stock.ticker }}" data-prices="{{ stock.history|tojson }}" width="120" height="28" style="width: 120px; height: 28px;"></canvas>
+                                        </div>
+                                    </td>
+                                    <td><span class="price-text" id="price-{{ stock.ticker }}">{{ "{:,.2f}".format(stock.current_price).replace(",", "X").replace(".", ",").replace("X", ".") }} TL</span></td>
+                                    <td>
+                                        <form method="POST" action="{{ url_for('trade', stock_id=stock.id) }}" class="trade-form-inline" style="justify-content: center;">
+                                            <input type="number" name="quantity" min="1" value="1" class="trade-qty-input" required>
+                                            <button type="submit" name="action" value="BUY" class="btn btn-sm btn-buy">AL</button>
+                                            <button type="submit" name="action" value="SELL" class="btn btn-sm btn-sell">SAT</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <!-- Sağ Sütun: Portföy, Leaderboard, AI Bot Logs, Haberler -->
+            <aside style="display: flex; flex-direction: column; gap: 1.5rem;">
+                
+                <!-- Portföyüm Widget -->
+                <div class="glass-card-section" style="margin-bottom: 0;">
+                    <h2 class="section-title">💼 Portföyüm (Çantam)</h2>
+                    <div class="table-container" id="portfolio-section">
+                        {% if portfolio_details %}
+                                <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>Hisse</th>
+                                        <th>Portföy (Adet)</th>
+                                        <th>Toplam Değer</th>
+                                        <th style="text-align: right;">Kâr / Zarar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in portfolio_details %}
+                                        <tr>
+                                            <td><span class="ticker-badge" style="background: rgba(255,255,255,0.05); color: white; border-color: var(--border-color);">{{ item.ticker }}</span></td>
+                                            <td>
+                                                <strong>{{ item.quantity }}</strong> adet
+                                                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                                                    Ort: {{ "{:,.2f}".format(item.average_cost).replace(",", "X").replace(".", ",").replace("X", ".") }} TL
+                                                </div>
+                                            </td>
+                                            <td style="font-weight: 700; vertical-align: middle;">
+                                                {{ "{:,.2f}".format(item.current_value).replace(",", "X").replace(".", ",").replace("X", ".") }} TL
+                                            </td>
+                                            <td class="{{ 'text-emerald' if item.profit_loss >= 0 else 'text-danger' }}" style="font-weight: 700; text-align: right; vertical-align: middle;">
+                                                {{ '+' if item.profit_loss > 0 }}{{ "{:,.2f}".format(item.profit_loss).replace(",", "X").replace(".", ",").replace("X", ".") }} TL
+                                                <div style="font-size: 0.72rem; font-weight: 600; opacity: 0.9;">
+                                                    {{ '+' if item.profit_loss > 0 }}{{ "%.2f"|format(item.profit_loss_pct) }}%
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="empty-state">
+                                <span class="empty-state-title">Portföyünüz Boş 📭</span>
+                                <span style="font-size: 0.8rem;">Sahip olduğunuz varlıklar burada listelenir. Soldaki market panelinden alım yapabilirsiniz.</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Küresel Liderlik Tablosu (Global Leaderboard) -->
+                <div class="glass-card-section" style="margin-bottom: 0;">
+                    <h2 class="section-title">🏆 Küresel Liderlik Tablosu</h2>
+                    <div class="leaderboard-list" id="leaderboard-list">
+                        {% for rank in leaderboard %}
+                            <div class="leaderboard-item {{ 'highlight' if rank.is_current else '' }}">
+                                <div class="leaderboard-user-info">
+                                    <span class="leaderboard-rank leaderboard-rank-{{ loop.index }}">{{ loop.index }}</span>
+                                    <span class="leaderboard-name">{{ rank.username }}</span>
+                                    <span class="leaderboard-badge {{ 'badge-sen' if rank.role == '⭐ SEN' else 'badge-bot' if rank.role == '🤖 BALİNA' else 'badge-player' }}">
+                                        {{ rank.role }}
+                                    </span>
+                                </div>
+                                <span class="leaderboard-wealth">
+                                    {{ "{:,.2f}".format(rank.wealth).replace(",", "X").replace(".", ",").replace("X", ".") }} TL
+                                </span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Balina İşlem Akışı (AI Whale Activity Logs) -->
+                <div class="glass-card-section" style="margin-bottom: 0;">
+                    <h2 class="section-title">🐳 Balina İşlem Akışı (AI Whale Tracker)</h2>
+                    <div class="bot-activity-list" id="bot-activity-list">
+                        <div class="empty-state" style="padding: 1.5rem 1rem;">
+                            <span>AI balina hareketleri bekleniyor... 📡</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kronolojik Borsa Haber Akışı Widget -->
+                <div class="glass-card-section">
+                    <h2 class="section-title">📰 Borsa Haber Akışı (Son 5 Gelişme)</h2>
+                    <div class="news-feed-container" id="news-feed-container">
+                        {% if news_feed %}
+                            {% for item in news_feed %}
+                                <div class="news-feed-item">
+                                    <div class="news-item-header">
+                                        <span class="news-item-badge {{ 'badge-positive' if item.news_type == 'positive' else 'badge-negative' }}">
+                                            {{ 'OLUMLU 📈' if item.news_type == 'positive' else 'OLUMSUZ 📉' }}
+                                        </span>
+                                        <span class="news-item-time">{{ item.timestamp.strftime('%H:%M:%S') }}</span>
+                                    </div>
+                                    <div class="news-item-content">
+                                        {{ item.headline }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state" style="padding: 1.5rem 1rem;">
+                                <span>Henüz haber kaydı bulunmuyor.</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- Real-Time Sparkline ve Borsa Güncelleme Scripti -->
+    <script>
+        function formatTL(num) {
+            return num.toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.');
+        }
+
+        // Switching tabs for Stocks and Crypto
+        function switchMarketTab(tabType) {
+            const stocksTable = document.getElementById('stocks-table-container');
+            const cryptoTable = document.getElementById('crypto-table-container');
+            const stocksBtn = document.getElementById('tab-stocks');
+            const cryptoBtn = document.getElementById('tab-crypto');
+            
+            if (tabType === 'stocks') {
+                stocksTable.style.display = 'block';
+                cryptoTable.style.display = 'none';
+                stocksBtn.className = 'tab-btn active';
+                cryptoBtn.className = 'tab-btn';
+            } else {
+                stocksTable.style.display = 'none';
+                cryptoTable.style.display = 'block';
+                stocksBtn.className = 'tab-btn';
+                cryptoBtn.className = 'tab-btn active';
+            }
+        }
+
+        // Reusable Canvas Sparkline Drawer
+        function drawSparkline(canvas, prices) {
+            if (!prices || prices.length < 2) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = 120;
+            const height = 28;
+            
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            ctx.scale(dpr, dpr);
+            
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            const range = (max - min === 0) ? 1 : (max - min);
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            const isUp = prices[prices.length - 1] >= prices[0];
+            const strokeColor = isUp ? '#10b981' : '#ef4444';
+            const fillColor = isUp ? 'rgba(16, 185, 129, 0.08)' : 'rgba(239, 68, 68, 0.08)';
+            
+            ctx.beginPath();
+            prices.forEach(function(price, index) {
+                const x = (index / (prices.length - 1)) * width;
+                const y = height - ((price - min) / range) * (height - 8) - 4;
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2.2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+            
+            ctx.lineTo(width, height);
+            ctx.lineTo(0, height);
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+            
+            const lastX = width;
+            const lastY = height - ((prices[prices.length - 1] - min) / range) * (height - 8) - 4;
+            ctx.beginPath();
+            ctx.arc(lastX - 2.5, lastY, 3, 0, 2 * Math.PI);
+            ctx.fillStyle = strokeColor;
+            ctx.fill();
+        }
+
+        // Draw initial sparklines on page load
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.sparkline').forEach(function(canvas) {
+                const prices = JSON.parse(canvas.getAttribute('data-prices'));
+                drawSparkline(canvas, prices);
+            });
+            
+            // Poll for real-time background market ticks every 5 seconds
+            setInterval(fetchMarketTick, 5000);
+        });
+
+        // AJAX background update function
+        function fetchMarketTick() {
+            fetch('/api/market-tick')
+                .then(response => {
+                    if (!response.ok) throw new Error('API tick error');
+                    return response.json();
+                })
+                .then(data => {
+                    // 1. Update Player Stats
+                    document.getElementById('user-cash').innerText = formatTL(data.user_cash) + " TL";
+                    document.getElementById('user-portfolio').innerText = formatTL(data.user_portfolio_value) + " TL";
+                    document.getElementById('user-wealth').innerText = formatTL(data.user_wealth) + " TL";
+
+                    // 2. Update Live Stocks & Crypto Table Prices and Sparkline Trends
+                    data.stocks.forEach(stock => {
+                        const priceEl = document.getElementById(`price-${stock.ticker}`);
+                        if (priceEl) {
+                            priceEl.innerText = formatTL(stock.current_price) + " TL";
+                        }
+                        
+                        const canvas = document.getElementById(`sparkline-${stock.ticker}`);
+                        if (canvas) {
+                            canvas.setAttribute('data-prices', JSON.stringify(stock.history));
+                            drawSparkline(canvas, stock.history);
+                        }
+                    });
+
+                    // 3. Update Breaking News Alert Box
+                    if (data.news_item) {
+                        const newsCard = document.getElementById('breaking-news-card');
+                        const newsBadge = document.getElementById('breaking-news-badge');
+                        const newsHeadline = document.getElementById('breaking-news-headline');
+                        
+                        newsHeadline.innerText = data.news_item.headline;
+                        newsCard.style.display = 'flex';
+                        
+                        const accentColor = data.news_item.type === 'positive' ? '#10b981' : '#ef4444';
+                        newsCard.style.borderLeftColor = accentColor;
+                        newsBadge.style.backgroundColor = accentColor;
+                        newsBadge.style.boxShadow = `0 0 10px ${data.news_item.type === 'positive' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(239, 68, 68, 0.2)'}`;
+                    }
+
+                    // 4. Update News Feed Panel
+                    const feedContainer = document.getElementById('news-feed-container');
+                    if (feedContainer && data.news_feed) {
+                        feedContainer.innerHTML = '';
+                        if (data.news_feed.length === 0) {
+                            feedContainer.innerHTML = '<div class="empty-state" style="padding: 1.5rem 1rem;"><span>Henüz haber kaydı bulunmuyor.</span></div>';
+                        } else {
+                            data.news_feed.forEach(n => {
+                                const itemDiv = document.createElement('div');
+                                itemDiv.className = 'news-feed-item';
+                                const badgeClass = n.news_type === 'positive' ? 'badge-positive' : 'badge-negative';
+                                const badgeText = n.news_type === 'positive' ? 'OLUMLU 📈' : 'OLUMSUZ 📉';
+                                itemDiv.innerHTML = `
+                                    <div class="news-item-header">
+                                        <span class="news-item-badge ${badgeClass}">${badgeText}</span>
+                                        <span class="news-item-time">${n.time}</span>
+                                    </div>
+                                    <div class="news-item-content">${n.headline}</div>
+                                `;
+                                feedContainer.appendChild(itemDiv);
+                            });
+                        }
+                    }
+
+                    // 5. Update Portfolio Widget Table
+                    const portfolioSection = document.getElementById('portfolio-section');
+                    if (portfolioSection) {
+                        if (!data.portfolio_details || data.portfolio_details.length === 0) {
+                            portfolioSection.innerHTML = `
+                                <div class="empty-state">
+                                    <span class="empty-state-title">Portföyünüz Boş 📭</span>
+                                    <span style="font-size: 0.8rem;">Sahip olduğunuz varlıklar burada listelenir. Soldaki market panelinden alım yapabilirsiniz.</span>
+                                </div>
+                            `;
+                        } else {
+                            let tableHTML = `
+                                <table class="custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>Hisse</th>
+                                        <th>Portföy (Adet)</th>
+                                        <th>Toplam Değer</th>
+                                        <th style="text-align: right;">Kâr / Zarar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            `;
+                            data.portfolio_details.forEach(item => {
+                                const profitClass = item.profit_loss >= 0 ? 'text-emerald' : 'text-danger';
+                                const profitSign = item.profit_loss > 0 ? '+' : '';
+                                tableHTML += `
+                                    <tr>
+                                        <td><span class="ticker-badge" style="background: rgba(255,255,255,0.05); color: white; border-color: var(--border-color);">${item.ticker}</span></td>
+                                        <td>
+                                            <strong>${item.quantity}</strong> adet
+                                            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.15rem;">
+                                                Ort: ${formatTL(item.average_cost)} TL
+                                            </div>
+                                        </td>
+                                        <td style="font-weight: 700; vertical-align: middle;">
+                                            ${formatTL(item.current_value)} TL
+                                        </td>
+                                        <td class="${profitClass}" style="font-weight: 700; text-align: right; vertical-align: middle;">
+                                            ${profitSign}${formatTL(item.profit_loss)} TL
+                                            <div style="font-size: 0.72rem; font-weight: 600; opacity: 0.9;">
+                                                ${profitSign}${item.profit_loss_pct.toFixed(2)}%
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                            tableHTML += `
+                                    </tbody>
+                                </table>
+                            `;
+                            portfolioSection.innerHTML = tableHTML;
+                        }
+                    }
+
+                    // 6. Update Global Leaderboard
+                    const leaderboardList = document.getElementById('leaderboard-list');
+                    if (leaderboardList && data.leaderboard) {
+                        leaderboardList.innerHTML = '';
+                        data.leaderboard.forEach((rank, idx) => {
+                            const rankNum = idx + 1;
+                            const highlightClass = rank.is_current ? 'highlight' : '';
+                            
+                            let rankColorClass = '';
+                            if (rankNum === 1) rankColorClass = 'leaderboard-rank-1';
+                            else if (rankNum === 2) rankColorClass = 'leaderboard-rank-2';
+                            else if (rankNum === 3) rankColorClass = 'leaderboard-rank-3';
+                            
+                            let badgeClass = '';
+                            if (rank.role === '⭐ SEN') badgeClass = 'badge-sen';
+                            else if (rank.role === '🤖 BALİNA') badgeClass = 'badge-bot';
+                            else badgeClass = 'badge-player';
+                            
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = `leaderboard-item ${highlightClass}`;
+                            itemDiv.innerHTML = `
+                                <div class="leaderboard-user-info">
+                                    <span class="leaderboard-rank ${rankColorClass}">${rankNum}</span>
+                                    <span class="leaderboard-name">${rank.username}</span>
+                                    <span class="leaderboard-badge ${badgeClass}">${rank.role}</span>
+                                </div>
+                                <span class="leaderboard-wealth">${formatTL(rank.wealth)} TL</span>
+                            `;
+                            leaderboardList.appendChild(itemDiv);
+                        });
+                    }
+
+                    // 7. Update Whale bot activity feeds
+                    const botActivityList = document.getElementById('bot-activity-list');
+                    if (botActivityList && data.bot_activity && data.bot_activity.length > 0) {
+                        data.bot_activity.forEach(activity => {
+                            const logDiv = document.createElement('div');
+                            logDiv.className = 'bot-activity-item';
+                            logDiv.innerHTML = activity;
+                            
+                            if (botActivityList.querySelector('.empty-state')) {
+                                botActivityList.innerHTML = '';
+                            }
+                            botActivityList.insertBefore(logDiv, botActivityList.firstChild);
+                            
+                            if (botActivityList.children.length > 5) {
+                                botActivityList.removeChild(botActivityList.lastChild);
+                            }
+                        });
+                    }
+                })
+                .catch(err => console.error('Real-time background update failed:', err));
+        }
+
+        // ==============================================================================
+        // AI ADVISOR INTERACTIVE LOGIC
+        // ==============================================================================
+        function toggleAIAdvisor() {
+            const panel = document.getElementById('ai-advisor-panel');
+            if (panel.style.display === 'none' || panel.style.display === '') {
+                panel.style.display = 'flex';
+                const chatBody = document.getElementById('ai-advisor-chat-body');
+                chatBody.scrollTop = chatBody.scrollHeight;
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        let isTyping = false;
+        function getAIAdvice() {
+            if (isTyping) return;
+            
+            const chatBody = document.getElementById('ai-advisor-chat-body');
+            const askBtn = document.getElementById('ai-ask-btn');
+            
+            askBtn.disabled = true;
+            chatBody.innerHTML = '';
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'ai-loading-container';
+            loadingDiv.innerHTML = `
+                <div class="ai-loading-bar-wrapper" style="margin-top: 1rem;">
+                    <div class="ai-loading-bar"></div>
+                </div>
+                <div class="ai-loading-text" id="ai-loading-text" style="margin-top: 0.75rem;">Piyasa verileri okunuyor...</div>
+            `;
+            chatBody.appendChild(loadingDiv);
+            
+            const loadingPhrases = [
+                "Piyasa verileri analiz ediliyor...",
+                "Haber akışları taranıyor...",
+                "Portföy riski ve konsantrasyonu hesaplanıyor...",
+                "Broker Kerem strateji reçetesini hazırlıyor..."
+            ];
+            
+            let phraseIdx = 0;
+            const phraseInterval = setInterval(() => {
+                const textEl = document.getElementById('ai-loading-text');
+                if (textEl) {
+                    textEl.innerText = loadingPhrases[phraseIdx % loadingPhrases.length];
+                    phraseIdx++;
+                }
+            }, 1000);
+
+            fetch('/api/ai-advice')
+                .then(response => {
+                    clearInterval(phraseInterval);
+                    if (!response.ok) throw new Error("AI Advice API failed");
+                    return response.json();
+                })
+                .then(data => {
+                    chatBody.innerHTML = '';
+                    const bubble = document.createElement('div');
+                    bubble.className = 'ai-advisor-chat-bubble advisor';
+                    chatBody.appendChild(bubble);
+                    
+                    typeWriter(bubble, data.advice, () => {
+                        askBtn.disabled = false;
+                        askBtn.innerHTML = `🤖 Yeni Strateji Al`;
+                    });
+                })
+                .catch(err => {
+                    clearInterval(phraseInterval);
+                    console.error(err);
+                    chatBody.innerHTML = `
+                        <div class="ai-advisor-chat-bubble advisor" style="border-color: var(--color-danger); color: var(--color-danger);">
+                            ⚠️ Üzgünüm dostum, Wall Street sunucularında bir bağlantı kopukluğu yaşandı. Lütfen biraz sonra tekrar dene!
+                        </div>
+                    `;
+                    askBtn.disabled = false;
+                    askBtn.innerHTML = `🤖 Piyasa Stratejisi Al`;
+                });
+        }
+
+        function typeWriter(element, html, callback) {
+            isTyping = true;
+            let currentText = "";
+            let i = 0;
+            
+            function step() {
+                if (i >= html.length) {
+                    element.innerHTML = html;
+                    isTyping = false;
+                    if (callback) callback();
+                    return;
+                }
+                
+                if (html[i] === '<') {
+                    let tagCloseIdx = html.indexOf('>', i);
+                    if (tagCloseIdx !== -1) {
+                        currentText += html.substring(i, tagCloseIdx + 1);
+                        i = tagCloseIdx + 1;
+                        element.innerHTML = currentText;
+                        setTimeout(step, 5);
+                        return;
+                    }
+                }
+                
+                currentText += html[i];
+                element.innerHTML = currentText;
+                i++;
+                
+                const chatBody = document.getElementById('ai-advisor-chat-body');
+                if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
+                
+                setTimeout(step, 6);
+            }
+            step();
+        }
+    </script>
+
+    <!-- AI Financial Advisor Floating Panel Widget -->
+    <div class="ai-advisor-widget">
+        <!-- Expandable Panel -->
+        <div id="ai-advisor-panel" class="glass-card ai-advisor-panel">
+            <div class="ai-advisor-header">
+                <div class="ai-advisor-title-area">
+                    <div class="ai-advisor-avatar">🤖</div>
+                    <div>
+                        <div class="ai-advisor-title">Borsa Kaplanı AI</div>
+                        <div class="ai-advisor-subtitle">
+                            <span class="ai-advisor-status-dot" style="position:static; display:inline-block; width:8px; height:8px; box-shadow:0 0 4px var(--color-success); margin-right:3px;"></span>
+                            Broker Kerem Çevrimiçi
+                        </div>
+                    </div>
+                </div>
+                <button class="ai-advisor-close-btn" onclick="toggleAIAdvisor()">×</button>
+            </div>
+            
+            <div class="ai-advisor-body" id="ai-advisor-chat-body">
+                <div class="ai-advisor-chat-bubble advisor">
+                    👔 Selam dostum! Ben **Broker Kerem**. Piyasayı koklayan kurtlar gibi her saniye tahtaları, haberleri ve cüzdanındaki bakiyeyi izliyorum.<br><br>
+                    İlk piyasa stratejimi almak ve cüzdanını roketlemek için aşağıdaki butona tıkla! 🚀
+                </div>
+            </div>
+            
+            <div class="ai-advisor-footer">
+                <button id="ai-ask-btn" class="ai-advisor-btn" onclick="getAIAdvice()">
+                    🤖 Piyasa Stratejisi Al
+                </button>
+            </div>
+        </div>
+        
+        <!-- Floating Bubble Trigger -->
+        <div class="ai-advisor-bubble" onclick="toggleAIAdvisor()">
+            <span class="ai-icon">💬</span>
+            <span class="ai-advisor-status-dot"></span>
+        </div>
+    </div>
+</body>
+</html>
