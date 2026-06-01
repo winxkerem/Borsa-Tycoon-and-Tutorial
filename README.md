@@ -12,5 +12,10 @@ Proje, kullanıcıların sanal bir bakiye ile canlı akan finansal piyasalarda a
     2. Bağımlılıkları yükleyin: `pip install -r requirements.txt`
 ## 📓 AI Geliştirme Günlüğü
 * **Yapay Zeka Günlüğü:** `docs/ai-gunlugu.md` klasöründedir.
+
+
+
+
 `Düzeltme: İmla hataları giderildi`
 `Güncelleme: Bootstrap fintech dark tema başlığı eklendi`
+`Veritabanı: SQLAlchemy ilişkileri README'de açıklandı`
