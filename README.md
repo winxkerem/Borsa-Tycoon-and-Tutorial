@@ -19,3 +19,4 @@ Proje, kullanıcıların sanal bir bakiye ile canlı akan finansal piyasalarda a
 `Düzeltme: İmla hataları giderildi`
 `Güncelleme: Bootstrap fintech dark tema başlığı eklendi`
 `Veritabanı: SQLAlchemy ilişkileri README'de açıklandı`
+`Güvenlik: CSRF koruma maddesi eklendi`
