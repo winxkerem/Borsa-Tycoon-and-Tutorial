@@ -7,3 +7,6 @@ Proje, kullanıcıların sanal bir bakiye ile canlı akan finansal piyasalarda a
 ## 🛠️ Kullanılan Teknolojiler
 * **Backend:** Python 3.11 / Flask 3.x
 * **Veritabanı:** SQLite / SQLAlchemy 2.x
+## 📦 Kurulum Adımları
+    1. Proje klasörünü açın.
+    2. Bağımlılıkları yükleyin: `pip install -r requirements.txt`
