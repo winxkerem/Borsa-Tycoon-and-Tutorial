@@ -1,138 +1,8 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borsa Simülasyonu - Kontrol Paneli</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-    <style>
-        :root {
-            --bg-primary: #080c14;
-            --bg-surface: rgba(17, 24, 39, 0.7);
-            --bg-input: rgba(10, 15, 26, 0.8);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-primary: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --color-accent: #6366f1;
-            --color-accent-hover: #4f46e5;
-            --color-success: #10b981;
-            --color-danger: #ef4444;
-            --color-gold: #f59e0b;
-        }
+{% extends "base.html" %}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
+{% block title %}Borsa Simülasyonu - Kontrol Paneli{% endblock %}
 
-        body {
-            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-primary) 75%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.25rem 2rem;
-            background: rgba(8, 12, 20, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo-text {
-            font-size: 1.4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #a5b4fc, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 0.05em;
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .username-highlight {
-            color: var(--text-primary);
-            font-weight: 700;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            text-decoration: none;
-        }
-
-        .btn-sm {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.78rem;
-            border-radius: 6px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--color-accent), #4f46e5);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-buy {
-            background: rgba(16, 185, 129, 0.15);
-            border: 1px solid var(--color-success);
-            color: var(--color-success);
-        }
-        
-        .btn-buy:hover {
-            background: var(--color-success);
-            color: white;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-sell {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--color-danger);
-            color: var(--color-danger);
-        }
-        
-        .btn-sell:hover {
-            background: var(--color-danger);
-            color: white;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
-        }
-
+{% block extra_css %}
         .dashboard-container {
             max-width: 1300px;
             margin: 0 auto;
@@ -141,33 +11,6 @@
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
-        }
-
-        /* Notifications */
-        .alert-container {
-            width: 100%;
-        }
-
-        .alert {
-            padding: 0.85rem 1.25rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            border-left: 4px solid;
-            font-size: 0.88rem;
-            font-weight: 500;
-            animation: slideIn 0.3s ease;
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.12);
-            border-color: var(--color-success);
-            color: #34d399;
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.12);
-            border-color: var(--color-danger);
-            color: #fca5a5;
         }
 
         /* Stats Section */
@@ -235,93 +78,6 @@
             .main-grid {
                 grid-template-columns: 1fr;
             }
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .glass-card-section {
-            padding: 1.5rem;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-surface);
-            backdrop-filter: blur(16px);
-            margin-bottom: 1.5rem;
-        }
-
-        /* Table Styling */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.88rem;
-        }
-
-        .custom-table th {
-            background: rgba(255, 255, 255, 0.02);
-            padding: 0.85rem 1rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .custom-table td {
-            padding: 0.85rem 1rem;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: middle;
-        }
-
-        .custom-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .ticker-badge {
-            padding: 0.25rem 0.55rem;
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-            font-weight: 700;
-            border-radius: 6px;
-            font-size: 0.78rem;
-            letter-spacing: 0.03em;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            transition: all 0.2s ease;
-        }
-
-        .ticker-link {
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .ticker-link:hover .ticker-badge {
-            background: var(--color-accent);
-            color: white;
-            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
-            transform: scale(1.05);
-        }
-
-        .company-link {
-            text-decoration: none;
-            color: inherit;
-            transition: color 0.2s ease;
-        }
-
-        .company-link:hover {
-            color: var(--color-accent);
-        }
-
-        .price-text {
-            font-weight: 700;
-            color: var(--text-primary);
         }
 
         .trade-form-inline {
@@ -806,42 +562,15 @@
             box-shadow: none;
         }
 
-        @keyframes slideIn {
-            from { transform: translateY(-10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.4; }
             100% { opacity: 1; }
         }
-    </style>
-</head>
-<body>
-    <header class="navbar">
-        <div class="logo-container">
-            <span class="logo-text">📈 BORSA SİMÜLASYONU</span>
-        </div>
-        <div class="user-menu">
-            <span style="font-size: 0.9rem; color: var(--text-secondary);">
-                Oyuncu: <span class="username-highlight">{{ current_user.username }}</span>
-            </span>
-            <a href="{{ url_for('logout') }}" class="btn btn-secondary btn-sm">Çıkış Yap</a>
-        </div>
-    </header>
+{% endblock %}
 
+{% block content %}
     <main class="dashboard-container">
-        <!-- Bildirimler (Flashed Messages) -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="alert-container">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
 
         <!-- Son Dakika Haber Paneli (Breaking News) at the Top -->
         <div id="breaking-news-card" class="glass-card" style="padding: 1.1rem 1.5rem; border-left: 4px solid {{ '#10b981' if (news_item and (news_item.type == 'positive' or news_item.news_type == 'positive')) else '#ef4444' if news_item else 'rgba(0,0,0,0)' }}; display: {{ 'flex' if news_item else 'none' }}; align-items: center; gap: 1rem; background: rgba(17, 24, 39, 0.4); border-radius: 12px; margin-bottom: 1.5rem;">
@@ -895,12 +624,12 @@
                             {% for stock in stocks %}
                                 <tr>
                                     <td>
-                                        <a href="{{ url_for('stock_detail', stock_id=stock.id) }}" class="ticker-link">
+                                        <a href="{{ url_for('main.stock_detail', stock_id=stock.id) }}" class="ticker-link">
                                             <span class="ticker-badge">{{ stock.ticker }}</span>
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('stock_detail', stock_id=stock.id) }}" class="company-link">
+                                        <a href="{{ url_for('main.stock_detail', stock_id=stock.id) }}" class="company-link">
                                             <strong>{{ stock.company_name }}</strong>
                                         </a>
                                     </td>
@@ -912,7 +641,8 @@
                                     </td>
                                     <td><span class="price-text" id="price-{{ stock.ticker }}">{{ "{:,.2f}".format(stock.current_price).replace(",", "X").replace(".", ",").replace("X", ".") }} TL</span></td>
                                     <td>
-                                        <form method="POST" action="{{ url_for('trade', stock_id=stock.id) }}" class="trade-form-inline" style="justify-content: center;">
+                                        <form method="POST" action="{{ url_for('main.trade', stock_id=stock.id) }}" class="trade-form-inline" style="justify-content: center;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <input type="number" name="quantity" min="1" value="1" class="trade-qty-input" required>
                                             <button type="submit" name="action" value="BUY" class="btn btn-sm btn-buy">AL</button>
                                             <button type="submit" name="action" value="SELL" class="btn btn-sm btn-sell">SAT</button>
@@ -940,12 +670,12 @@
                             {% for stock in crypto_stocks %}
                                 <tr>
                                     <td>
-                                        <a href="{{ url_for('stock_detail', stock_id=stock.id) }}" class="ticker-link">
+                                        <a href="{{ url_for('main.stock_detail', stock_id=stock.id) }}" class="ticker-link">
                                             <span class="ticker-badge" style="background: rgba(245, 158, 11, 0.15); color: #fcd34d; border-color: rgba(245, 158, 11, 0.3);">{{ stock.ticker }}</span>
                                         </a>
                                     </td>
                                     <td>
-                                        <a href="{{ url_for('stock_detail', stock_id=stock.id) }}" class="company-link">
+                                        <a href="{{ url_for('main.stock_detail', stock_id=stock.id) }}" class="company-link">
                                             <strong>{{ stock.company_name }}</strong>
                                         </a>
                                     </td>
@@ -957,7 +687,8 @@
                                     </td>
                                     <td><span class="price-text" id="price-{{ stock.ticker }}">{{ "{:,.2f}".format(stock.current_price).replace(",", "X").replace(".", ",").replace("X", ".") }} TL</span></td>
                                     <td>
-                                        <form method="POST" action="{{ url_for('trade', stock_id=stock.id) }}" class="trade-form-inline" style="justify-content: center;">
+                                        <form method="POST" action="{{ url_for('main.trade', stock_id=stock.id) }}" class="trade-form-inline" style="justify-content: center;">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <input type="number" name="quantity" min="1" value="1" class="trade-qty-input" required>
                                             <button type="submit" name="action" value="BUY" class="btn btn-sm btn-buy">AL</button>
                                             <button type="submit" name="action" value="SELL" class="btn btn-sm btn-sell">SAT</button>
@@ -1014,6 +745,58 @@
                             <div class="empty-state">
                                 <span class="empty-state-title">Portföyünüz Boş 📭</span>
                                 <span style="font-size: 0.8rem;">Sahip olduğunuz varlıklar burada listelenir. Soldaki market panelinden alım yapabilirsiniz.</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Son İşlemlerim (Recent Transactions) -->
+                <div class="glass-card-section" style="margin-bottom: 0;">
+                    <h2 class="section-title">📝 Son İşlemlerim</h2>
+                    <div class="table-container">
+                        {% if tx_pagination.items %}
+                            <table class="custom-table" style="font-size: 0.82rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Varlık</th>
+                                        <th>Tip</th>
+                                        <th>Adet</th>
+                                        <th>Fiyat</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tx in tx_pagination.items %}
+                                        <tr>
+                                            <td><span class="ticker-badge" style="background: rgba(255,255,255,0.05); color: white; border-color: var(--border-color);">{{ tx.stock.ticker }}</span></td>
+                                            <td class="{{ 'text-emerald' if tx.transaction_type == 'AL' else 'text-danger' }}" style="font-weight: 700;">
+                                                {{ 'AL' if tx.transaction_type == 'AL' else 'SAT' }}
+                                            </td>
+                                            <td><strong>{{ tx.quantity }}</strong></td>
+                                            <td>{{ "{:,.2f}".format(tx.price).replace(",", "X").replace(".", ",").replace("X", ".") }} TL</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            
+                            <!-- Pagination Controls -->
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; font-size: 0.78rem;">
+                                {% if tx_pagination.has_prev %}
+                                    <a href="{{ url_for('main.dashboard', tx_page=tx_pagination.prev_num) }}" class="btn btn-sm btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">◀ Önceki</a>
+                                {% else %}
+                                    <span style="color: var(--text-secondary); opacity: 0.5;">◀ Önceki</span>
+                                {% endif %}
+                                
+                                <span style="color: var(--text-secondary);">Sayfa {{ tx_pagination.page }} / {{ tx_pagination.pages }}</span>
+                                
+                                {% if tx_pagination.has_next %}
+                                    <a href="{{ url_for('main.dashboard', tx_page=tx_pagination.next_num) }}" class="btn btn-sm btn-secondary" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Sonraki ▶</a>
+                                {% else %}
+                                    <span style="color: var(--text-secondary); opacity: 0.5;">Sonraki ▶</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state" style="padding: 1.5rem 1rem;">
+                                <span>Henüz işleminiz bulunmuyor.</span>
                             </div>
                         {% endif %}
                     </div>
@@ -1080,6 +863,47 @@
         </div>
     </main>
 
+    <!-- AI Financial Advisor Floating Panel Widget -->
+    <div class="ai-advisor-widget">
+        <!-- Expandable Panel -->
+        <div id="ai-advisor-panel" class="glass-card ai-advisor-panel">
+            <div class="ai-advisor-header">
+                <div class="ai-advisor-title-area">
+                    <div class="ai-advisor-avatar">🤖</div>
+                    <div>
+                        <div class="ai-advisor-title">Borsa Kaplanı AI</div>
+                        <div class="ai-advisor-subtitle">
+                            <span class="ai-advisor-status-dot" style="position:static; display:inline-block; width:8px; height:8px; box-shadow:0 0 4px var(--color-success); margin-right:3px;"></span>
+                            Broker Kerem Çevrimiçi
+                        </div>
+                    </div>
+                </div>
+                <button class="ai-advisor-close-btn" onclick="toggleAIAdvisor()">×</button>
+            </div>
+            
+            <div class="ai-advisor-body" id="ai-advisor-chat-body">
+                <div class="ai-advisor-chat-bubble advisor">
+                    👔 Selam dostum! Ben **Broker Kerem**. Piyasayı koklayan kurtlar gibi her saniye tahtaları, haberleri ve cüzdanındaki bakiyeyi izliyorum.<br><br>
+                    İlk piyasa stratejimi almak ve cüzdanını roketlemek için aşağıdaki butona tıkla! 🚀
+                </div>
+            </div>
+            
+            <div class="ai-advisor-footer">
+                <button id="ai-ask-btn" class="ai-advisor-btn" onclick="getAIAdvice()">
+                    🤖 Piyasa Stratejisi Al
+                </button>
+            </div>
+        </div>
+        
+        <!-- Floating Bubble Trigger -->
+        <div class="ai-advisor-bubble" onclick="toggleAIAdvisor()">
+            <span class="ai-icon">💬</span>
+            <span class="ai-advisor-status-dot"></span>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
     <!-- Real-Time Sparkline ve Borsa Güncelleme Scripti -->
     <script>
         function formatTL(num) {
@@ -1335,7 +1159,7 @@
                             logDiv.innerHTML = activity;
                             
                             if (botActivityList.querySelector('.empty-state')) {
-                                botActivityList.innerHTML = '';
+                                  botActivityList.innerHTML = '';
                             }
                             botActivityList.insertBefore(logDiv, botActivityList.firstChild);
                             
@@ -1464,44 +1288,4 @@
             step();
         }
     </script>
-
-    <!-- AI Financial Advisor Floating Panel Widget -->
-    <div class="ai-advisor-widget">
-        <!-- Expandable Panel -->
-        <div id="ai-advisor-panel" class="glass-card ai-advisor-panel">
-            <div class="ai-advisor-header">
-                <div class="ai-advisor-title-area">
-                    <div class="ai-advisor-avatar">🤖</div>
-                    <div>
-                        <div class="ai-advisor-title">Borsa Kaplanı AI</div>
-                        <div class="ai-advisor-subtitle">
-                            <span class="ai-advisor-status-dot" style="position:static; display:inline-block; width:8px; height:8px; box-shadow:0 0 4px var(--color-success); margin-right:3px;"></span>
-                            Broker Kerem Çevrimiçi
-                        </div>
-                    </div>
-                </div>
-                <button class="ai-advisor-close-btn" onclick="toggleAIAdvisor()">×</button>
-            </div>
-            
-            <div class="ai-advisor-body" id="ai-advisor-chat-body">
-                <div class="ai-advisor-chat-bubble advisor">
-                    👔 Selam dostum! Ben **Broker Kerem**. Piyasayı koklayan kurtlar gibi her saniye tahtaları, haberleri ve cüzdanındaki bakiyeyi izliyorum.<br><br>
-                    İlk piyasa stratejimi almak ve cüzdanını roketlemek için aşağıdaki butona tıkla! 🚀
-                </div>
-            </div>
-            
-            <div class="ai-advisor-footer">
-                <button id="ai-ask-btn" class="ai-advisor-btn" onclick="getAIAdvice()">
-                    🤖 Piyasa Stratejisi Al
-                </button>
-            </div>
-        </div>
-        
-        <!-- Floating Bubble Trigger -->
-        <div class="ai-advisor-bubble" onclick="toggleAIAdvisor()">
-            <span class="ai-icon">💬</span>
-            <span class="ai-advisor-status-dot"></span>
-        </div>
-    </div>
-</body>
-</html>
+{% endblock %}

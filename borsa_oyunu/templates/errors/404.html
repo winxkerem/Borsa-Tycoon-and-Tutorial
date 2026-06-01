@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Sayfa Bulunamadı - 404{% endblock %}
+
+{% block extra_css %}
+    .error-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 200px);
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .error-code {
+        font-size: 8rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #f59e0b, #ef4444);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1;
+        margin-bottom: 1rem;
+        animation: pulse 2s infinite;
+    }
+    
+    .error-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: white;
+        margin-bottom: 1rem;
+    }
+    
+    .error-message {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        max-width: 500px;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+{% endblock %}
+
+{% block content %}
+<div class="error-container">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Aradığınız Varlık Bulunamadı!</h1>
+    <p class="error-message">
+        İstediğiniz sayfa kaldırılmış, adı değiştirilmiş veya geçici olarak kullanılamıyor olabilir. Portföyünüzü kontrol etmek veya markete dönmek için ana panele dönebilirsiniz.
+    </p>
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-primary">
+        🏠 Kontrol Paneline Dön
+    </a>
+</div>
+{% endblock %}

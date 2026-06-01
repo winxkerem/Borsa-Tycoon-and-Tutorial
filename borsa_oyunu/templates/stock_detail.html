@@ -1,251 +1,8 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ stock.ticker }} - Hisse Detay ve Analiz Paneli</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-    <style>
-        :root {
-            --bg-primary: #080c14;
-            --bg-surface: rgba(17, 24, 39, 0.7);
-            --bg-input: rgba(10, 15, 26, 0.8);
-            --border-color: rgba(255, 255, 255, 0.08);
-            --text-primary: #f3f4f6;
-            --text-secondary: #9ca3af;
-            --color-accent: #6366f1;
-            --color-accent-hover: #4f46e5;
-            --color-success: #10b981;
-            --color-danger: #ef4444;
-            --color-gold: #f59e0b;
-        }
+{% extends "base.html" %}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
+{% block title %}{{ stock.ticker }} - Hisse Detay ve Analiz Paneli{% endblock %}
 
-        body {
-            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg-primary) 75%);
-            color: var(--text-primary);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.25rem 2rem;
-            background: rgba(8, 12, 20, 0.85);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .logo-text {
-            font-size: 1.4rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #a5b4fc, #6366f1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 0.05em;
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-        }
-
-        .username-highlight {
-            color: var(--text-primary);
-            font-weight: 700;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.6rem 1.2rem;
-            font-size: 0.88rem;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            text-decoration: none;
-            gap: 0.5rem;
-        }
-
-        .btn-sm {
-            padding: 0.4rem 0.8rem;
-            font-size: 0.78rem;
-            border-radius: 6px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--color-accent), #4f46e5);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-buy {
-            background: var(--color-success);
-            color: white;
-            flex-grow: 1;
-        }
-        
-        .btn-buy:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-sell {
-            background: var(--color-danger);
-            color: white;
-            flex-grow: 1;
-        }
-        
-        .btn-sell:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
-        }
-
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 2rem;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        /* Alert styling */
-        .alert-container {
-            width: 100%;
-        }
-
-        .alert {
-            padding: 0.85rem 1.25rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            border-left: 4px solid;
-            font-size: 0.88rem;
-            font-weight: 500;
-            animation: slideIn 0.3s ease;
-        }
-
-        .alert-success {
-            background: rgba(16, 185, 129, 0.12);
-            border-color: var(--color-success);
-            color: #34d399;
-        }
-
-        .alert-danger {
-            background: rgba(239, 68, 68, 0.12);
-            border-color: var(--color-danger);
-            color: #fca5a5;
-        }
-
-        /* Page Layout Grid */
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1.8fr 1.2fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 1024px) {
-            .detail-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .glass-card-section {
-            padding: 1.5rem;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            background: var(--bg-surface);
-            backdrop-filter: blur(16px);
-            margin-bottom: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .ticker-badge {
-            padding: 0.3rem 0.7rem;
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-            font-weight: 800;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            letter-spacing: 0.05em;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            display: inline-block;
-        }
-
-        /* Meta Information Cards */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 1rem;
-        }
-
-        .info-card {
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-
-        .info-label {
-            font-size: 0.72rem;
-            color: var(--text-secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .info-value {
-            font-size: 1.05rem;
-            font-weight: 700;
-        }
-
+{% block extra_css %}
         .price-hero {
             display: flex;
             align-items: baseline;
@@ -292,18 +49,6 @@
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 14px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .form-group label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-weight: 600;
         }
 
         .qty-input-group {
@@ -387,60 +132,32 @@
             color: var(--text-secondary);
         }
 
-        .badge-positive {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--color-success);
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
-        .badge-negative {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--color-danger);
+        /* Page Layout Grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1.8fr 1.2fr;
+            gap: 1.5rem;
         }
 
-        .text-emerald { color: var(--color-success); }
-        .text-danger { color: var(--color-danger); }
-        .text-gold { color: var(--color-gold); }
-
-        .empty-state {
-            padding: 2rem 1rem;
-            text-align: center;
-            color: var(--text-secondary);
-            font-size: 0.84rem;
+        @media (max-width: 1024px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
         }
+{% endblock %}
 
-        @keyframes slideIn {
-            from { transform: translateY(-10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-    </style>
-</head>
-<body>
-    <header class="navbar">
-        <div class="logo-container">
-            <span class="logo-text">📈 BORSA SİMÜLASYONU</span>
-        </div>
-        <div class="user-menu">
-            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary btn-sm">
-                ◀ Dashboard'a Dön
-            </a>
-            <span style="font-size: 0.9rem; color: var(--text-secondary);">
-                Oyuncu: <span class="username-highlight">{{ current_user.username }}</span>
-            </span>
-        </div>
-    </header>
-
+{% block content %}
     <main class="container">
-        <!-- Bildirimler (Flashed Messages) -->
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="alert-container">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
-
         <!-- Hisse Hero Başlık Kartı -->
         <section class="glass-card" style="padding: 1.5rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1.5rem; background: rgba(17, 24, 39, 0.5);">
             <div style="display: flex; align-items: center; gap: 1rem;">
@@ -534,7 +251,8 @@
                 <div class="glass-card-section" style="margin-bottom: 0;">
                     <h2 class="section-title">⚡ Anlık İşlem Terminali</h2>
                     
-                    <form method="POST" action="{{ url_for('trade', stock_id=stock.id) }}" class="trade-terminal">
+                    <form method="POST" action="{{ url_for('main.trade', stock_id=stock.id) }}" class="trade-terminal">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="form-group">
                             <label for="quantity">İşlem Adeti</label>
                             <div class="qty-input-group">
@@ -586,7 +304,9 @@
 
         </div>
     </main>
+{% endblock %}
 
+{% block extra_js %}
     <!-- Büyük Detaylı Grafik Çizim ve Polling Scripti -->
     <script>
         let livePriceValue = {{ stock.current_price }};
@@ -701,12 +421,12 @@
             });
 
             // Set stroke styles and draw
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = shadowColor;
             ctx.strokeStyle = strokeColor;
             ctx.lineWidth = 3;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = shadowColor;
             ctx.stroke();
             ctx.shadowBlur = 0; // Reset shadow
 
@@ -828,7 +548,25 @@
                             "ASELS": ["ASELS", "ASELSAN"],
                             "EREGL": ["EREGL", "Ereğli"],
                             "GARAN": ["GARAN", "Garanti"],
-                            "TUPRS": ["TUPRS", "Tüpraş"]
+                            "TUPRS": ["TUPRS", "Tüpraş"],
+                            "AKBNK": ["AKBNK", "Akbank"],
+                            "BAMBI": ["BAMBI", "Bambi", "Perakende"],
+                            "FROTO": ["FROTO", "Ford"],
+                            "KCHOL": ["KCHOL", "Koç"],
+                            "PETKM": ["PETKM", "Petkim"],
+                            "PGSUS": ["PGSUS", "Pegasus"],
+                            "SAHOL": ["SAHOL", "Sabancı"],
+                            "SISE": ["SISE", "Şişecam"],
+                            "TCELL": ["TCELL", "Turkcell"],
+                            "VESTL": ["VESTL", "Vestel"],
+                            "BTC": ["BTC", "Bitcoin"],
+                            "ETH": ["ETH", "Ethereum"],
+                            "SOL": ["SOL", "Solana"],
+                            "AVAX": ["AVAX", "Avalanche"],
+                            "BNB": ["BNB", "Binance"],
+                            "DOGE": ["DOGE", "Dogecoin"],
+                            "DOT": ["DOT", "Polkadot"],
+                            "XRP": ["XRP", "Ripple"]
                         };
                         const matchKeywords = keywords[stockTicker] || [stockTicker];
                         const filteredNews = data.news_feed.filter(n => {
@@ -859,5 +597,4 @@
                 .catch(err => console.error('Stock detail polling failed:', err));
         }
     </script>
-</body>
-</html>
+{% endblock %}
