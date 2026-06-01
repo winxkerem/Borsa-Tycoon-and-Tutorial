@@ -10,3 +10,5 @@ Proje, kullanıcıların sanal bir bakiye ile canlı akan finansal piyasalarda a
 ## 📦 Kurulum Adımları
     1. Proje klasörünü açın.
     2. Bağımlılıkları yükleyin: `pip install -r requirements.txt`
+## 📓 AI Geliştirme Günlüğü
+* **Yapay Zeka Günlüğü:** `docs/ai-gunlugu.md` klasöründedir.
