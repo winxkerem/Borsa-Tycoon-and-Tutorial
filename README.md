@@ -13,3 +13,4 @@ Proje, kullanıcıların sanal bir bakiye ile canlı akan finansal piyasalarda a
 ## 📓 AI Geliştirme Günlüğü
 * **Yapay Zeka Günlüğü:** `docs/ai-gunlugu.md` klasöründedir.
 `Düzeltme: İmla hataları giderildi`
+`Güncelleme: Bootstrap fintech dark tema başlığı eklendi`
